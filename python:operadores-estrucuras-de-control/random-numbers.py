@@ -7,6 +7,9 @@ class Game:
     tries = 10
 
     def welcome_message(self):
+        """
+        Print the default welcome message when the game starts
+        """
         print('''
             Welcome!
             In this game you have to guess what's the secret number (0-99).
@@ -20,17 +23,29 @@ class Game:
             ''')
 
     def show_user_score(self, game_state="current"):
+        """
+        Print the current user's core
+        """
         print("** Your {} score is: [{}] **".format(game_state, self.score))
     
     def show_remainig_tries(self):
+        """
+        Print the reamining user's reamining tries
+        """
         print("Ties: ", self.tries)
 
     def show_random_word(self):
+        """
+        Print a random word when the user couldn't guess the word
+        """
         words = ['Wrong!', "Nop, that wasn't the word", "Try again", "Nice try", "You were closed", "Do not surrender yet", "Nop"]
         index = random.randint(0,len(words)-1)
         print("Error --> {} \n".format(words[index]))
 
     def check_answer(self, user_answer: int) -> bool:
+        """
+        Check the users's anwer
+        """
         if (self.RANDOM_NUMBER == user_answer):
             return True
         
@@ -40,6 +55,9 @@ class Game:
             
 
     def start(self):
+        """
+        Main process. It starts the game.
+        """
         try:
             self.welcome_message()
             victory = False
