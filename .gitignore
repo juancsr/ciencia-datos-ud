@@ -1,6 +1,9 @@
 # npm files
 node_modules
 
+# files
+reto_1/graphs
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
