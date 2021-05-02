@@ -1,23 +1,19 @@
-import logo from './logo.svg';
 import './App.css';
+import XAsisSelect from './components/xaxis-select';
+import Graph from './components/graph/graph';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Vacunas Covid-19 2021</h1>
+      <div>
+        <div id="menu-options">
+          <XAsisSelect />
+        </div>
+        <div id="graph">
+          <Graph />
+        </div>
+      </div>
     </div>
   );
 }
