@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 from sodapy import Socrata
-from flask import Flask, request
+from flask import Flask, request, send_file
 
 # https://www.datos.gov.co/Salud-y-Protecci-n-Social/Asignaci-n-de-dosis-de-vacuna-contra-COVID-19/sdvb-4x4j
 client = Socrata('www.datos.gov.co', None)
@@ -20,13 +20,13 @@ app = Flask(__name__)
 
 @app.route('/territorios')
 def territorios():
-    frame_data = data['nom_territorio'].to_list()
+    frame_data = data['nom_territorio'].drop_duplicates().to_list()
     response = {value: value.replace('_',' ') for value in frame_data}
     return response
 
 @app.route('/labs')
 def labs():
-    return data['laboratorio_vacuna'].to_dict()
+    return data['laboratorio_vacuna'].drop_duplicates().to_dict()
 
 
 def save_graph(dataframe, gtype='line') -> str:
@@ -46,7 +46,6 @@ def save_graph(dataframe, gtype='line') -> str:
     filename = "{}_{}.png".format(str(datetime.now()).replace(' ',''), gtype)
     file_path = "{}/{}".format(graph_dict, filename)
 
-    print(dataframe)
     dataframe.plot(x='x', y='cantidad', kind=gtype).get_figure().savefig(file_path)
     return file_path
 
@@ -77,7 +76,7 @@ def build_graph(x: str, ys: list, limit=0, asc=True, *args, **kwargs) -> str:
 @app.route('/')
 @app.route('/graph')
 def graph():
-    query_args = request.args
+    query_args = request.args.get('nom_territorio')
     limit = int(request.args.get('limit'))
     order = request.args.get('order') if request.args.get else 'asc'
     #for arg in query_args:
@@ -85,7 +84,7 @@ def graph():
     asc = True if order == 'asc' else False
     img_path = build_graph('nom_territorio', ['cantidad'], limit, asc)
     print(img_path)
-    return "done"
+    return send_file(img_path, mimetype='image/png')
 
 
 
