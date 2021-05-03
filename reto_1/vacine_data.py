@@ -74,7 +74,7 @@ def save_graph(dataframe, gtype) -> str:
     return file_path
 
 
-def build_graph(xs: str, ys: list, limit=0, asc=True, *args, **kwargs) -> str:
+def build_graph(xs: str, ys: list, limit=0, asc=True, filter_values=[]) -> str:
     """
     builds the graph image
         x: the x axis
@@ -83,24 +83,37 @@ def build_graph(xs: str, ys: list, limit=0, asc=True, *args, **kwargs) -> str:
         asc: asc or desc data
     returns the html table of the dataframe
     """
-    grouped = data.groupby(xs)[ys].sum()
-    frame = dict()
-    for x in xs:
-        if limit != 0:
-            upper_limit = limit if asc else data.groupby(x)[ys].count()
-            lower_limit = upper_limit - limit
+    if len(filter_values) > 0:
+        grouped = data.groupby(xs)[ys].sum().filter(items=filter_values, axis=0)
+    else:
+        grouped = data.groupby(xs)[ys].sum()
+    # frame = dict()
+    # for x in xs:
+    #     if limit != 0:
+    #         upper_limit = limit if asc else data.groupby(x)[ys].count()
+    #         lower_limit = upper_limit - limit
             
-            a = grouped.index.to_list( )[lower_limit:upper_limit]
-            frame[x] = a
-            frame['cantidad'] = grouped.loc[a, 'cantidad'].to_list()
-            #frame = { xs: a, 'cantidad': grouped.loc[a, 'cantidad'].to_list() }
-        else:
-            frame[x] = grouped.index.to_list()
-            frame['cantidad'] = grouped.loc[:,'cantidad'].to_list()
-            #frame = { xs: grouped.index.to_list(), 'cantidad': grouped.loc[:,'cantidad'].to_list() }
-    
-    df = pd.DataFrame(grouped['cantidad']).fillna(value=0)
-    return df.to_html()
+    #         a = grouped.index.to_list( )[lower_limit:upper_limit]
+    #         frame[x] = a
+    #         frame['cantidad'] = grouped.loc[a, 'cantidad'].to_list()
+    #         #frame = { xs: a, 'cantidad': grouped.loc[a, 'cantidad'].to_list() }
+    #     else:
+    #         frame[x] = grouped.index.to_list()
+    #         frame['cantidad'] = grouped.loc[:,'cantidad'].to_list()
+    #         #frame = { xs: grouped.index.to_list(), 'cantidad': grouped.loc[:,'cantidad'].to_list() }
+
+    df = pd.DataFrame(grouped[ys]).fillna(value=0)
+    df.sort_values(by=['cantidad'], inplace=True, ascending=not asc)
+    upper_limit = limit if limit > 0 else len(df)
+    #upper_limit = limit
+    #lower_limit = upper_limit - limit
+    #print("{} to {}".format(lower_limit, upper_limit))
+    indexes = df['cantidad'].index.to_list( )[:upper_limit]
+    if not asc:
+        indexes.reverse()
+    print(indexes)
+    print(df.loc[indexes,:])
+    return df.loc[indexes,:].to_html()
 
 
 @app.route('/')
@@ -111,11 +124,15 @@ def graph():
     x = x.replace(' ', '').split(',')
     y = y.replace(' ', '').split(',')
     limit = int(request.args.get('limit'))
-    order = request.args.get('order') if request.args.get else 'asc'
-    asc = True if order == 'asc' else False
-    print('params:',x,y,limit,asc)
-    html = build_graph(x, y, limit, asc)
-    #print('img_path:',img_path)
+    asc = True if request.args.get('order') == 'asc' else False
+    filter_values = []
+    
+    if len(x) == 1 and (x[0] == 'nom_territorio' or x[0] == 'laboratorio_vacuna'):
+        if len(request.args.get('filter')) > 0:
+            filter_values = request.args.get('filter').split(',')
+    
+    html = build_graph(x, y, limit, asc, filter_values)
+    
     return html
 
 
