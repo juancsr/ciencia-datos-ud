@@ -1,22 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GetAllLaboratorios } from '../redux/actions/laboratoriosActions';
 import { GetAllTerritorios } from '../redux/actions/territoriosActions';
+import { GetAllColumns, SelectColumn, AddSelectedColumn } from '../redux/actions/columnActions';
 import { connect } from 'react-redux';
 import SelectLab from './select-lab';
 import SelectTerritorio from './select-territorio';
+import SelectedColumns from './selected-columns';
 
 const XSelect = ({
+	columnsReducer,
 	GetAllLaboratorios,
-	GetAllTerritorios
+	GetAllTerritorios,
+	GetAllColumns,
+	SelectColumn,
+	AddSelectedColumn,
 }) => {
-	const options = ['Territorio', 'Laboratorio'];
 	const [axisSelected, selectAxis] = useState(null);
 
+	useEffect(() => {
+		GetAllColumns();
+	}, []);
+
 	const handleChange = (e) => {
-		console.log(e.target.value)
+		SelectColumn(e.target.value);
 		switch (e.target.value) {
 			case 'Territorio':
-			default:
 				GetAllTerritorios();
 				selectAxis(<SelectTerritorio />);
 				break;
@@ -24,22 +32,42 @@ const XSelect = ({
 				GetAllLaboratorios();
 				selectAxis(<SelectLab />);
 				break;
+			default:
+				selectAxis(null);
+				break;
 		}
-		// console.log(laboratoriosReducer, territoriosReducer);
+
+		const { selectedColumns } = columnsReducer;
+
+        if (selectedColumns.indexOf(e.target.value) === -1) {
+            selectedColumns.push(e.target.value);
+        } else {
+            selectedColumns.splice(selectedColumns.indexOf(e.target.value), 1);
+        }
+		AddSelectedColumn(selectedColumns);
 	}
 
 	return (
 		<>
-			<label>Eje X</label>
+			<label>Columnas</label>
 
 			<select onChange={handleChange}>
 				{/* <option value="a">a</option> */}
-				{options.map((option, i) =>  <option value={option} key={i}>{option}</option>)}
+				{Object.keys(columnsReducer.columnList).map((key) => {
+					const value = columnsReducer.columnList[key];
+					return <option value={key} key={key}>{value}</option>;
+            	})}
+				{/* {options.map((option, i) =>  <option value={option} key={i}>{option}</option>)} */}
 			</select>
 			
-			<div>{axisSelected}</div>
+			<div>
+				<SelectedColumns />
+			</div>
+			{/* <div>{axisSelected}</div> */}
 		</>
 	)
 }
 
-export default connect(null, {GetAllLaboratorios, GetAllTerritorios})(XSelect);
+const mapStateToProps = ({columnsReducer}) => ({columnsReducer})
+
+export default connect(mapStateToProps, {GetAllLaboratorios, GetAllTerritorios, GetAllColumns, SelectColumn, AddSelectedColumn})(XSelect);

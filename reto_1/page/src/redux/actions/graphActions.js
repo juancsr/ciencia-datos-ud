@@ -1,8 +1,9 @@
 import { GET_GRAPH } from '../types/graphTypes';
 import { GET, BASE_URL } from './requestHandler';
 
-export const GetGraph = () => async (dispatch) => {
-    const graphResponse = await GET(`${BASE_URL}graph`);
+export const GetGraph = (x, ys, limit, order) => async (dispatch) => {
+    const query = `x=${x}&y=${ys}&limit=${limit}&order=${order}`
+    const graphResponse = await GET(`${BASE_URL}graph?${query}`);
     try {
         dispatch({
             type: GET_GRAPH,
