@@ -23,12 +23,13 @@ const XSelect = ({
 
 	const handleChange = (e) => {
 		SelectColumn(e.target.value);
+		console.log(e.target.value);
 		switch (e.target.value) {
-			case 'Territorio':
+			case 'nom_territorio':
 				GetAllTerritorios();
 				selectAxis(<SelectTerritorio />);
 				break;
-			case 'Laboratorio':
+			case 'laboratorio_vacuna':
 				GetAllLaboratorios();
 				selectAxis(<SelectLab />);
 				break;
@@ -49,7 +50,7 @@ const XSelect = ({
 
 	return (
 		<>
-			<label>Columnas</label>
+			<label><b>Columnas</b></label>
 
 			<select onChange={handleChange}>
 				{/* <option value="a">a</option> */}
@@ -63,7 +64,7 @@ const XSelect = ({
 			<div>
 				<SelectedColumns />
 			</div>
-			{/* <div>{axisSelected}</div> */}
+			<div>{axisSelected}</div>
 		</>
 	)
 }

@@ -12,13 +12,20 @@ const CompSelectTerritorio = ({
         //SelectTerritorio(e.target.value);
     }
     return (
-        <select onChange={handleChange}>
+        <div>
+            <br></br>
+            <label><b>LISTA DE TERRITORIOS: </b></label>
+            <br></br>
+            <select onChange={handleChange}>
             <option disabled>Selecciona uno</option>
+            <option default>TODOS</option>
             {Object.keys(territoriosReducer.listaTerritorios).map((key) => {
                 const value = territoriosReducer.listaTerritorios[key];
                 return <option value={value} key={key}>{value}</option>;
             })}
         </select>
+        </div>
+        
     )
 }
 
