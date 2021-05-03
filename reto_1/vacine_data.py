@@ -121,7 +121,8 @@ def graph():
     
     return html
 
-
+if __name__ == '__main__':
+    app.run(threaded=True, port=5000)
 #frame = {'Territorio': data['nom_territorio'], 'Cantidad': data['cantidad'].apply(pd.to_numeric)}
 #df = pd.DataFrame(frame).fillna(value=0)
 #df['Cantidad'] = df['Cantidad'].apply(pd.to_numeric)
