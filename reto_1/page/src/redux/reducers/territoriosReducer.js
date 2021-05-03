@@ -1,8 +1,9 @@
-import { GET_TERRITORIOS, TERRITORIO_SELECTED } from '../types/territoriosTypes';
+import { GET_TERRITORIOS, TERRITORIO_SELECTED, TERRITORIOS } from '../types/territoriosTypes';
 
 const INITIAL_STATE = {
     listaTerritorios: [],
     territorio: null,
+    territorios: [],
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
@@ -11,6 +12,8 @@ const reducer = (state = INITIAL_STATE, action) => {
             return {...state, listaTerritorios: action.payload};
         case TERRITORIO_SELECTED:
             return {...state, territorio: action.payload};
+        case TERRITORIOS:
+            return {...state, territorios: action.payload};
         default:
             return state;
     }

@@ -9,7 +9,7 @@ const CompSelectTerritorio = ({
     console.log(territoriosReducer);
     const handleChange = (e) => {
         console.log(e.target.value);
-        //SelectTerritorio(e.target.value);
+        SelectTerritorio(e.target.value);
     }
     return (
         <div>
@@ -17,15 +17,15 @@ const CompSelectTerritorio = ({
             <label><b>LISTA DE TERRITORIOS: </b></label>
             <br></br>
             <select onChange={handleChange}>
-            <option disabled>Selecciona uno</option>
-            <option default>TODOS</option>
-            {Object.keys(territoriosReducer.listaTerritorios).map((key) => {
-                const value = territoriosReducer.listaTerritorios[key];
-                return <option value={value} key={key}>{value}</option>;
-            })}
-        </select>
+                <option disabled>Selecciona uno</option>
+                <option value={"TODOS"} default>TODOS</option>
+                {Object.keys(territoriosReducer.listaTerritorios).map((key) => {
+                    const value = territoriosReducer.listaTerritorios[key];
+                    return <option value={value} key={key}>{value}</option>;
+                })}
+            </select>
         </div>
-        
+
     )
 }
 

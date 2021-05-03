@@ -87,20 +87,6 @@ def build_graph(xs: str, ys: list, limit=0, asc=True, filter_values=[]) -> str:
         grouped = data.groupby(xs)[ys].sum().filter(items=filter_values, axis=0)
     else:
         grouped = data.groupby(xs)[ys].sum()
-    # frame = dict()
-    # for x in xs:
-    #     if limit != 0:
-    #         upper_limit = limit if asc else data.groupby(x)[ys].count()
-    #         lower_limit = upper_limit - limit
-            
-    #         a = grouped.index.to_list( )[lower_limit:upper_limit]
-    #         frame[x] = a
-    #         frame['cantidad'] = grouped.loc[a, 'cantidad'].to_list()
-    #         #frame = { xs: a, 'cantidad': grouped.loc[a, 'cantidad'].to_list() }
-    #     else:
-    #         frame[x] = grouped.index.to_list()
-    #         frame['cantidad'] = grouped.loc[:,'cantidad'].to_list()
-    #         #frame = { xs: grouped.index.to_list(), 'cantidad': grouped.loc[:,'cantidad'].to_list() }
 
     df = pd.DataFrame(grouped[ys]).fillna(value=0)
     df.sort_values(by=['cantidad'], inplace=True, ascending=not asc)
