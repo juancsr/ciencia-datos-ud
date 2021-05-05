@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://127.0.0.1:5000/'; // Local
-//export const BASE_URL = 'https://peppy-generator-303612.uc.r.appspot.com/'; // Production
+//export const BASE_URL = 'http://127.0.0.1:5000/'; // Local
+export const BASE_URL = 'https://reto1.herokuapp.com//'; // Production
 
 const https = require('https');
 
