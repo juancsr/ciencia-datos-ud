@@ -6,8 +6,6 @@ se encuentren en dólares, euros y libras.
 """
 import numpy as np
 import pandas as pd
-import requests as req
-import statistics as stat
 
 # Generar dataframe
 data = np.random.randint(low=0, high=100, size=(12, 3))
