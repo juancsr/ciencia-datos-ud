@@ -3,6 +3,7 @@ node_modules
 
 # files
 reto_1/graphs
+pandas_visualizar/figures
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
