@@ -19,12 +19,13 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
+from pandas.core.frame import DataFrame
 
 df = pd.read_csv('./survey_results_public.csv')
 #print(df.index, df.columns)
-print(df)
+# print(df)
 
-def save_graph(dataframe, gtype: str) -> str:
+def save_graph(dataframe, gtype: str, x='', y='', title='') -> str:
     try:
         """
         Takes a dataframe, turns into a graph, save the graph as image
@@ -35,59 +36,89 @@ def save_graph(dataframe, gtype: str) -> str:
         folder_name = 'figures'
         curr_dict = pathlib.Path(__file__).parent.absolute()
         figures_dict = "{}/{}/{}".format(curr_dict, folder_name, gtype)
-        columns = dataframe.columns.values.tolist()
+
+        # creates folder if doesn't exists
         if not os.path.exists(figures_dict):
             os.makedirs(figures_dict)
 
         filename = "{}_{}.png".format(str(datetime.now()).replace(' ', '').replace(':', '-'),gtype)
         file_path = "{}/{}".format(figures_dict, filename)
-
+        plot_title = '{}: {}'.format(gtype, x) if title == '' else title
         if gtype == 'scatter': 
-            plot = dataframe.plot(x=columns[0], y=columns[2], kind=gtype, figsize=(20, 10))
+            plot = dataframe.plot(x=x, y=y, kind=gtype, figsize=(20, 10))
         elif gtype == 'pie':
-            plot = dataframe.plot(x=columns[0], y=columns[3], kind=gtype, figsize=(20, 10))
+            plot = dataframe.plot(x=x, y=y, kind=gtype, figsize=(20, 10))
         else:
-            plot = dataframe.plot(x=columns[8], y=columns[4], kind=gtype)
-        plot.set_xticks(dataframe.index)
-        plot.set_xticklabels(dataframe[columns[0]], rotation=90)
+            if y != '':
+                print('y is not empty')
+                plot = dataframe.fillna(value=0).plot(kind=gtype, xlabel=x, ylabel=y, y=y,  x=x, title=plot_title, figsize=(20, 10))
+            else:
+                plot = dataframe[x].fillna(value=0).plot(kind=gtype, xlabel='People', ylabel=x, title=plot_title, figsize=(20, 10))
+
         plot.get_figure().savefig(file_path)
         return file_path
     except Exception as e:
-        print('error saving graph {}'.format(e))
+        print('error saving graph ({}) -> {}'.format(gtype, e))
+
 
 lower_limit = 0
-upper_limit = 50
+upper_limit = 100
 
-dfline = df[lower_limit:upper_limit].fillna(value=0)
-print(dfline)
-file_path = save_graph(dfline, 'line')
+print(df.columns)
 
-dfbar = df[lower_limit:upper_limit].fillna(value=0)
-print(dfbar)
-file_path = save_graph(dfbar, 'bar')
+ages = df['Age']
+main_branch = df['MainBranch']
+age_1st_code = df['Age1stCode']
+country = df['Country']
+database_next_year = df['DatabaseDesireNextYear']
+web_framework = df['WebframeWorkedWith']
+
+frame = {'MainBranch': main_branch, 'Age1stCode': age_1st_code, 'Age': ages, 
+'Country': country, 'DatabaseNextYear': database_next_year, 'WebFramework': web_framework}
+n_df = DataFrame(frame).fillna(value=0).reset_index()
+
+# only takes the first 100 records, i don't want a gigant plot
+reduced_df = DataFrame(n_df[lower_limit: upper_limit])
+
+# groupped dataframes
+grouped_by_country = reduced_df.groupby('Country').aggregate(np.sum)
+
+# plot line
+line_path = save_graph(reduced_df, 'line', 'Age', title='Devs by Age')
+
+# bar
+country_df = DataFrame({'Country ': grouped_by_country.index, 'People': grouped_by_country['Age']}).reset_index()
+line_path = save_graph(country_df.loc[:, ('Country', 'People')], 'bar', 'Country', 'People', 'Devs by Country')
+
+# area
+area_path = save_graph(country_df.loc[:, ('Country', 'People')], 'area', 'Country', 'People', 'Devs by Country')
+
+# hist
+grouped_by_webframework = reduced_df.groupby(by='WebFramework').aggregate(np.sum).reset_index()
+grouped_by_webframework.rename(columns = {'index': 'People'}, inplace=True)
+
+plot = reduced_df.fillna(value=0).plot(kind='hist', 
+    xlabel='Frameworks', ylabel='Popularity', 
+    x='WebFramework', title='Framework popularity', figsize=(20, 10))
+plot.get_figure().savefig('./figures/hist.png')
 
 
-dfarea = df[lower_limit:upper_limit].fillna(value=0)
-print(dfarea)
-file_path = save_graph(dfarea, 'area')
+# pie
+grouped_by_database = reduced_df.groupby(['DatabaseNextYear']).sum().dropna(axis=0, how='any')
+grouped_by_database = grouped_by_database.loc['Cassandra;DynamoDB;MongoDB':]
+print(grouped_by_database)
+plot_pie = grouped_by_database.plot(kind='pie', y='index', title='Database to learn next year per dev', figsize=(20, 20), autopct='%1.1f%%')
+plot_pie.get_figure().savefig('./figures/pie.png')
 
-dfhist = df[lower_limit:upper_limit].fillna(value=0)
-print(dfhist)
-file_path = save_graph(dfhist, 'hist')
+# # box
+# box_path = save_graph(reduced_df, 'box', 'Age1stCode', 'MainBranch', title='First time coding')
+# # dfbox = df[lower_limit:upper_limit].fillna(value=0)
+# # print(dfbox)
+# # file_path = save_graph(dfbox, 'box')
 
-dfbox = df[lower_limit:upper_limit].fillna(value=0)
-print(dfbox)
-file_path = save_graph(dfbox, 'box')
+# # pie
+# pie_path = save_graph(reduced_df, 'pie', 'DatabaseDesireNextYear', title='Desired database for next year')
 
-dfpie = df[lower_limit:upper_limit].fillna(value=0)
-print(dfpie)
-file_path = save_graph(dfpie, 'pie')
-
-dfscatter = df[lower_limit:upper_limit].fillna(value=0)
-print(dfscatter)
-file_path = save_graph(dfscatter, 'scatter')
-
-#plt.figure()
-#plt.show()
-
-#plt.close("all")
+# print(reduced_df.columns)
+# # scatter
+# scatter_path = save_graph(reduced_df, 'scatter', 'DatabaseDesireNextYear', title='Desired database for next year')
