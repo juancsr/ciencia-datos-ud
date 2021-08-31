@@ -7,11 +7,11 @@ que como mínimo incluya los siguientes tipos de gráficas:
 ☑ hist, 
 ☑ box, 
 ☑ pie, 
-table, 
+☑table, 
 ☑ scatter, 
-scatter matrix, 
-radViz, 
-colormaps (aplicar a cualquier tipo de gráfica).
+☑ scatter matrix, 
+☑ radViz, 
+☑ colormaps (aplicar a cualquier tipo de gráfica).
 """
 import os
 import pathlib
@@ -111,17 +111,14 @@ plot_pie = grouped_by_database.plot(kind='pie', y='index', title='Database to le
 plot_pie.get_figure().savefig('./figures/pie.png')
 
 # # box
-# box_path = save_graph(reduced_df, 'box', 'Age1stCode', 'MainBranch', title='First time coding')
-# # dfbox = df[lower_limit:upper_limit].fillna(value=0)
-# # print(dfbox)
-# # file_path = save_graph(dfbox, 'box')
-
-# # pie
-# pie_path = save_graph(reduced_df, 'pie', 'DatabaseDesireNextYear', title='Desired database for next year')
+box_path = save_graph(reduced_df, 'box', 'Age1stCode', 'MainBranch', title='First time coding')
+dfbox = df[lower_limit:upper_limit].fillna(value=0)
+print(dfbox)
+file_path = save_graph(dfbox, 'box')
 
 # print(reduced_df.columns)
-# # scatter
-# scatter_path = save_graph(reduced_df, 'scatter', 'DatabaseDesireNextYear', title='Desired database for next year')
+# scatter
+scatter_path = save_graph(reduced_df, 'scatter', 'DatabaseDesireNextYear', title='Desired database for next year')
 
 # radViz
 pd.plotting.radviz(grouped_by_database, 'Age')
