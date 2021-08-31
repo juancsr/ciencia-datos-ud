@@ -122,3 +122,6 @@ plot_pie.get_figure().savefig('./figures/pie.png')
 # print(reduced_df.columns)
 # # scatter
 # scatter_path = save_graph(reduced_df, 'scatter', 'DatabaseDesireNextYear', title='Desired database for next year')
+
+# radViz
+pd.plotting.radviz(grouped_by_database, 'Age')
