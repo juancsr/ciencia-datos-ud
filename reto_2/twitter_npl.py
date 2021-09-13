@@ -53,7 +53,8 @@ if len(tweets) <= 0:
   auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
   auth.set_access_token(access_token, access_token_secret)
   api = tweepy.API(auth)
-  public_tweets = api.home_timeline()
+  search_words = ['covid','#covid-19','#covid19', 'lockdown']
+  public_tweets = api.search(q=search_words, lang='en', count=1000)
 
   for tweet in public_tweets:
     tweets.append({'tweet': tweet.text})
@@ -62,7 +63,6 @@ if len(tweets) <= 0:
   if ok:
     log_info('inserted done!')
 
-log_info(tweets)
 '''
 3. Minería de datos e Interpretación
 Hacerlo con Matplotlib
