@@ -5,6 +5,7 @@ node_modules
 reto_1/graphs
 pandas_visualizar/figures
 .credentials.*
+reto_2/db_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

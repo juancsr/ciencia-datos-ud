@@ -1,4 +1,5 @@
 {
     "python.pythonPath": "/home/juancsr/.pyenv/versions/ciencia-datos/bin/python",
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
 }
