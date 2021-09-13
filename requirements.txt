@@ -64,6 +64,7 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
 statistics==1.0.3.5
 stem==1.8.0
+textblob==0.15.3
 threadpoolctl==2.2.0
 toml==0.10.2
 torrequest==0.1.0
@@ -74,5 +75,6 @@ typing-extensions==3.10.0.0
 urllib3==1.26.4
 virtualenv==20.4.7
 Werkzeug==1.0.1
+wordcloud==1.8.1
 wrapt==1.12.1
 zipp==3.4.1

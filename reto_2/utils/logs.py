@@ -2,6 +2,7 @@ WARNING_TYPE = 'WARNING'
 ERROR_TYPE = 'ERROR'
 LOG_TYPE = 'LOG'
 
+# TODO: All some colors
 def log(ltype: str, msg: any):
   print('-- [{}] {} --'.format(ltype, msg))
 

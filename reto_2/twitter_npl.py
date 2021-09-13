@@ -65,7 +65,7 @@ if len(tweets) <= 0:
     log_info('inserted done!')
 
 # NLP
-
+# From: https://www.youtube.com/watch?v=ujId4ipkBio
 # -- Pre-procesor
 df = pd.DataFrame([tweet['text'] for tweet in tweets], columns=['Tweets'])
 print(df.head())
@@ -100,3 +100,63 @@ df['Polarity'] = df['Tweets'].apply(get_polarity)
 print(df)
 
 # Word Cloud
+allwords = ' '.join([twts for twts in df['Tweets']])
+wc = WordCloud(width=500, height=300, random_state=21, max_font_size=119).generate(allwords)
+
+# Statistics
+plt.imshow(wc, interpolation='bilinear')
+plt.axis('off')
+plt.savefig('./bilinear.png')
+# common words: covid19, lockdown, victoria, delta
+
+# function that compute the negative, neutral and positive analysis
+def get_analysis(score):
+  if score < 0:
+    return 'Negative'
+  elif score == 0:
+    return 'Neutral'
+  else:
+    return 'Positive'
+
+df['Analysis'] = df['Polarity'].apply(get_analysis)
+print(df.head())
+
+log_info('Print all of the positive tweets')
+sorted_df = df.sort_values(by=['Polarity'])
+for i in range(0, sorted_df.shape[0]):
+  analysis = sorted_df['Analysis'][i]
+  if analysis == 'Positive':
+    print(sorted_df['Tweets'][i])
+  
+# Plot polarity and subjectivity
+plt.figure(figsize=(10, 12))
+for i in range(0, df.shape[0]):
+  plt.scatter(df['Polarity'][i], df['Subjectivity'][i], color='Blue')
+
+plt.title('Sentiment Analysis')
+plt.xlabel('Polarity')
+plt.ylabel('Subjectivity')
+plt.savefig('./scatter.png')
+
+log_info('Final results')
+# Positive tweets count
+pos_tweets = df[df.Analysis == 'Positive'].shape[0]
+per_pos = round(pos_tweets / df.shape[0] * 100, 1)
+# Negative tweets count
+neg_tweets = df[df.Analysis == 'Negative'].shape[0]
+per_neg = round(neg_tweets / df.shape[0] * 100, 1)
+# Neutral tweets count
+neu_tweets = df[df.Analysis == 'Neutral'].shape[0]
+per_neu = round(neu_tweets / df.shape[0] * 100, 1)
+
+print('Number of positive tweets: {} ({} %)'.format(pos_tweets, per_pos) )
+print('Number of negative tweets: {} ({} %)'.format(neg_tweets, per_neg) )
+print('Number of neutral tweets: {} ({} %)'.format(neu_tweets, per_neu))
+
+# Plot and visualize the counts
+plt.figure(figsize=(10, 13))
+plt.title('Sentiment Analysis')
+plt.xlabel('Sentiment')
+plt.ylabel('Counts')
+df['Analysis'].value_counts().plot(kind='bar')
+plt.savefig('./bar.png')
