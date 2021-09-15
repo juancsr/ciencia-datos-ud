@@ -1,4 +1,5 @@
 import os
+import nltk
 from typing import Text
 import tweepy
 import pandas as pd
@@ -10,6 +11,8 @@ from wordcloud import WordCloud
 from database.mongo import MongoDB
 from utils.logs import log_info, log_error, log_warning
 
+nltk.download('punkt')
+nltk.download('wordnet')
 plt.style.use('fivethirtyeight')
 
 consumer_key = None
@@ -56,7 +59,7 @@ if len(tweets) <= 0:
   api = tweepy.API(auth)
   search_words = ['covid','#covid-19','#covid19', 'lockdown']
   public_tweets = api.search(q=search_words, lang='en', count=1000)
-  
+
   for tweet in public_tweets:
     tweets.append({'text': tweet.text})
 
@@ -68,7 +71,6 @@ if len(tweets) <= 0:
 # From: https://www.youtube.com/watch?v=ujId4ipkBio
 # -- Pre-procesor
 df = pd.DataFrame([tweet['text'] for tweet in tweets], columns=['Tweets'])
-print(df.head())
 
 # cleanning data...
 def clean_tweet(tweet_text: str):
@@ -80,12 +82,29 @@ def clean_tweet(tweet_text: str):
   tweet_text = re.sub(r'RT[\s]', '', tweet_text)
   # Removing URLs
   tweet_text = re.sub(r'https?:\/\/\S+', '', tweet_text)
+  # Remove '
+  tweet_text = tweet_text.replace("'", '')
   tweet_text = tweet_text.lower()
   return tweet_text
 
 df['Tweets'] = df['Tweets'].apply(clean_tweet)
-print(df.head())
+
+
 # -- Transformation
+def get_words(text):
+  return TextBlob(text).words.lemmatize()
+
+# Word Cloud
+df['Words'] = df['Tweets'].apply(get_words)
+allwords = ' '.join([twts for twts in df['Tweets']]) # this one works better than lemmatize
+#allwords = ' '.join([str(twts) for twts in df['Words']])
+wc = WordCloud(width=500, height=300, random_state=21, max_font_size=119).generate(allwords)
+
+# Statistics
+plt.imshow(wc, interpolation='bilinear')
+plt.axis('off')
+plt.savefig('./bilinear.png')
+# common words: covid19, lockdown, victoria, delta
 
 # -- Data mining
 # Sentiment Analysis
@@ -95,19 +114,9 @@ def get_subjectivity(text):
 def get_polarity(text):
   return TextBlob(text).sentiment.polarity
 
+
 df['Subjectivity'] = df['Tweets'].apply(get_subjectivity)
 df['Polarity'] = df['Tweets'].apply(get_polarity)
-print(df)
-
-# Word Cloud
-allwords = ' '.join([twts for twts in df['Tweets']])
-wc = WordCloud(width=500, height=300, random_state=21, max_font_size=119).generate(allwords)
-
-# Statistics
-plt.imshow(wc, interpolation='bilinear')
-plt.axis('off')
-plt.savefig('./bilinear.png')
-# common words: covid19, lockdown, victoria, delta
 
 # function that compute the negative, neutral and positive analysis
 def get_analysis(score):
@@ -119,14 +128,14 @@ def get_analysis(score):
     return 'Positive'
 
 df['Analysis'] = df['Polarity'].apply(get_analysis)
-print(df.head())
 
 log_info('Print all of the positive tweets')
 sorted_df = df.sort_values(by=['Polarity'])
+pos_tweets = []
 for i in range(0, sorted_df.shape[0]):
   analysis = sorted_df['Analysis'][i]
   if analysis == 'Positive':
-    print(sorted_df['Tweets'][i])
+    pos_tweets = sorted_df['Tweets'][i]
   
 # Plot polarity and subjectivity
 plt.figure(figsize=(10, 12))
