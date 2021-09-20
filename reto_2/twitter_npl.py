@@ -89,7 +89,6 @@ def clean_tweet(tweet_text: str):
 
 df['Tweets'] = df['Tweets'].apply(clean_tweet)
 
-
 # -- Transformation
 def get_words(text):
   return TextBlob(text).words.lemmatize()
@@ -136,7 +135,7 @@ for i in range(0, sorted_df.shape[0]):
   analysis = sorted_df['Analysis'][i]
   if analysis == 'Positive':
     pos_tweets = sorted_df['Tweets'][i]
-  
+
 # Plot polarity and subjectivity
 plt.figure(figsize=(10, 12))
 for i in range(0, df.shape[0]):
